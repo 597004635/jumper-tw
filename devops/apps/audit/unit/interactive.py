@@ -6,6 +6,8 @@ import sys, socket
 from paramiko.py3compat import u
 from audit.models import AuditLog
 
+unsupport_cmd_list = ['rz','sz','shutdown','init 0','shutdown']
+
 try:
     import termios
     import tty
@@ -49,6 +51,8 @@ def posix_shell(chan, session_obj):
                 if len(x) == 0:
                     break
                 if x == '\r':
+                    if cmd in unsupport_cmd_list:
+                        x="...Operation is not supported\r\n"
                     AuditLog.objects.create(session=session_obj,cmd=cmd)
                     cmd = ''
                 elif x == '\t':
